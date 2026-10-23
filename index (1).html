@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Frozono Gráficas</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;600;800&display=swap">
+<style>
+:root{--bg:#f5f7fc;--card:#fff;--fg:#0f1a3d;--muted:#5d6a8f;--line:#dde3f3;--accent:#1565d8;--font:"Lexend",system-ui,sans-serif}
+@media (prefers-color-scheme:dark){:root{--bg:#0b1024;--card:#131a36;--fg:#eef2ff;--muted:#9aa6cc;--line:#2c3762;--accent:#5aa2ff;color-scheme:dark}}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--font)}
+.wrap{max-width:900px;margin:0 auto;padding:32px 16px}
+h1{font-weight:800;margin:0 0 4px}
+.sub{color:var(--muted);margin:0 0 28px}
+h2{font-size:15px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin:28px 0 10px}
+.item{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center;justify-content:space-between;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-bottom:8px}
+.item a{color:var(--fg);font-weight:600;text-decoration:none}
+.item a:hover{color:var(--accent)}
+code{font-size:12px;color:var(--muted);word-break:break-all}
+button{font:inherit;font-size:13px;border:1px solid var(--accent);color:var(--accent);background:none;border-radius:8px;padding:6px 12px;cursor:pointer}
+</style></head><body>
+<div class="wrap">
+<h1>Frozono Gráficas</h1>
+<p class="sub">Gráficas interactivas por semana. Copia el link y pégalo en Web Viewer de PowerPoint.</p>
+<div id="list"></div>
+</div>
+<script>
+// Agregar nuevas gráficas aquí: [semana, carpeta, título]
+const GRAFICAS=[
+ ["2026-S43","pastel-aumento-ene-sep","15 espacios con más aumento en kWh (Ene–Sep)"],
+];
+const base=location.href.replace(/index\.html$/,"").replace(/\/?$/,"/");
+const weeks=[...new Set(GRAFICAS.map(g=>g[0]))].sort().reverse();
+document.getElementById("list").innerHTML=weeks.map(w=>`<h2>${w}</h2>`+GRAFICAS.filter(g=>g[0]===w).map(([s,c,t])=>{
+  const url=`${base}${s}/${c}/`;
+  return `<div class="item"><div><a href="${url}" target="_blank">${t}</a><br><code>${url}</code></div><button data-u="${url}">Copiar link</button></div>`}).join("")).join("");
+document.addEventListener("click",e=>{const u=e.target.dataset?.u;if(!u)return;
+  navigator.clipboard.writeText(u).then(()=>{e.target.textContent="Copiado"},()=>{});});
+</script>
+</body></html>

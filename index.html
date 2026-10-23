@@ -30,7 +30,7 @@ svg{display:block;width:100%;height:auto;min-width:640px;max-width:1100px;margin
 .slice .ext,.slice .shadow{opacity:0;transition:opacity .3s}
 .slice.on .ext{opacity:1}.slice.on .shadow{opacity:.45}
 .slice.on .top{filter:brightness(1.08) saturate(1.1)}
-.chart.has-on .slice:not(.on) .top{filter:saturate(.55) opacity(.55)}
+.chart.has-on .slice:not(.on) .top{filter:saturate(.7) opacity(.7)}
 .lbl{transition:opacity .3s}
 .chart.has-on .lbl:not(.on){opacity:.28}
 .lbl .name{font-weight:700;font-size:15px}
@@ -127,10 +127,11 @@ const GAP=44, sides={L:[],R:[]};
 items.forEach(it=>{it.side=Math.sin(it.mid)>=0?"R":"L";it.y=CY-(R+60)*Math.cos(it.mid);sides[it.side].push(it)});
 for(const s of["L","R"]){
   const arr=sides[s].sort((a,b)=>a.y-b.y);
-  for(let k=1;k<arr.length;k++) arr[k].y=Math.max(arr[k].y,arr[k-1].y+GAP);
+  const ex=it=>it.d[0].length>20?17:0;
+  for(let k=1;k<arr.length;k++) arr[k].y=Math.max(arr[k].y,arr[k-1].y+GAP+ex(arr[k]));
   const maxY=740; const over=arr.length?arr[arr.length-1].y-maxY:0;
   if(over>0) arr.forEach(it=>it.y-=over);
-  for(let k=arr.length-2;k>=0;k--) arr[k].y=Math.min(arr[k].y,arr[k+1].y-GAP);
+  for(let k=arr.length-2;k>=0;k--) arr[k].y=Math.min(arr[k].y,arr[k+1].y-GAP-ex(arr[k+1]));
 }
 items.forEach(it=>{
   const {d,side,y,mid}=it, right=side==="R";
@@ -139,14 +140,18 @@ items.forEach(it=>{
   const g=el("g",{class:"lbl"},gLabels);
   const color=d[3];
   const box=el("rect",{class:"box",rx:10,fill:"var(--card)",stroke:color,"stroke-width":2},g);
-  el("path",{class:"lead",d:`M${sx},${sy} L${ex},${ey} L${lx+(right?-8:8)},${y-6}`,stroke:color,"marker-start":"url(#arrow)"},g);
+  el("path",{class:"lead",d:`M${sx},${sy} L${ex},${ey} L${lx+(right?-8:8)},${y-6}`,stroke:color},g);
   el("circle",{class:"dot",cx:sx,cy:sy,r:3.5,fill:color},g);
-  const t=el("text",{x:lx,y:y-10,"text-anchor":anchor},g);
-  const n=el("tspan",{class:"name",fill:"var(--fg)"},t);n.textContent=d[0];
+  // nombres largos en dos líneas
+  let lines=[d[0]];
+  if(d[0].length>20){const cut=d[0].lastIndexOf(" ",Math.ceil(d[0].length/2)+2);lines=[d[0].slice(0,cut),d[0].slice(cut+1)]}
+  const off=(lines.length-1)*17;
+  const t=el("text",{x:lx,y:y-10-off,"text-anchor":anchor},g);
+  lines.forEach((ln,k)=>{const n=el("tspan",{class:"name",fill:"var(--fg)",x:lx,dy:k?17:0},t);n.textContent=ln});
   const t2=el("text",{x:lx,y:y+9,"text-anchor":anchor},g);
   const v=el("tspan",{class:"val"},t2);v.textContent=fmt(d[1])+" kWh  ";
   const p=el("tspan",{class:"pct",fill:color},t2);p.textContent=d[2];
-  it.lbl=g;it.box=box;it.texts=[t,t2];
+  it.lbl=g;it.box=box;it.lead=g.querySelector(".lead");it.texts=[t,t2];
 });
 // size boxes after render
 requestAnimationFrame(()=>items.forEach(it=>{
@@ -169,12 +174,12 @@ function showDetail(it){
 let active=null;
 function set(it){
   if(active===it) return;
-  if(active){active.g.classList.remove("on");active.g.style.transform="";active.lbl.classList.remove("on")}
+  if(active){active.g.classList.remove("on");active.g.style.transform="";active.lbl.classList.remove("on");active.lead.removeAttribute("marker-start")}
   active=it;
   chart.classList.toggle("has-on",!!it);
   if(it){
     gSlices.appendChild(it.g); gLabels.appendChild(it.lbl);
-    it.g.classList.add("on"); it.lbl.classList.add("on");
+    it.g.classList.add("on"); it.lbl.classList.add("on"); it.lead.setAttribute("marker-start","url(#arrow)");
     requestAnimationFrame(()=>it.g.style.transform=it.pop);
   }
   showDetail(it);
