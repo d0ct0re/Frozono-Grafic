@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Aumento – Cargas identificadas S43</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;600;700;800&display=swap">
+<style>
+/* Diapositiva 16:9: todo el contenido vive en un SVG 1600x900 que se escala completo a la ventana, sin scroll */
+html,body{margin:0;height:100%;overflow:hidden;background:#f4f6fb}
+svg{display:block;width:100vw;height:100vh;font-family:"Lexend","Segoe UI",Calibri,sans-serif;user-select:none}
+.slice{cursor:pointer;transition:transform .45s cubic-bezier(.2,.9,.25,1.2);outline:none}
+.slice .top{stroke:#fff;stroke-width:2.5;transition:filter .3s}
+.slice .ext,.slice .shadow{opacity:0;transition:opacity .3s}
+.slice.on .ext{opacity:1}.slice.on .shadow{opacity:.45}
+.slice.on .top{filter:brightness(1.08) saturate(1.1)}
+svg.has-on .slice:not(.on) .top{filter:saturate(.75) opacity(.75)}
+.lbl{cursor:pointer;transition:opacity .3s}
+svg.has-on .lbl:not(.on){opacity:.3}
+.lbl .name{font-weight:700;font-size:26px}
+.lbl .note{font-size:19px}
+.lbl .val{font-size:24px}
+.lbl .pct{font-weight:700;font-size:25px}
+.lbl .lead{fill:none;stroke-width:2;transition:stroke-width .3s}
+.lbl.on .lead{stroke-width:4}
+.lbl .box{opacity:0;transition:opacity .3s}.lbl.on .box{opacity:1}
+.lbl .dot{transition:opacity .3s}.lbl.on .dot{opacity:0}
+svg.intro .slice .top{animation:grow .7s cubic-bezier(.2,.9,.25,1.1) both;animation-delay:inherit;transform-box:view-box;transform-origin:800px 470px}
+svg.intro .slice{animation:none}
+svg.intro .lbl{animation:fadein .5s ease both}
+svg.intro .grp{animation:fadein .6s ease 1s both}
+@keyframes grow{from{transform:scale(.2) rotate(-40deg);opacity:0}to{transform:none;opacity:1}}
+@keyframes fadein{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.slice,.lbl,.lbl *{transition:none!important}}
+</style></head><body>
+<svg id="svg" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Aumento – Cargas identificadas S43"></svg>
+<script>window.CHART={title:"AUMENTO – CARGAS IDENTIFICADAS",subtitle:"Enero – Semana 43  |  Comparación 2025 vs 2026",header:"band",section:"DISTRIBUCIÓN DEL INCREMENTO",
+cx:800,cy:475,r:255,labelTop:190,labelBottom:820,gap:14,labelDx:110,order:["pct","val"],pctColor:"#e3141b",nameColor:i=>"#2e66d3",
+totalText:"Total de cambios: {T} kWh",group:{names:["Socios Corporativos","Concesiones Expedition","Iniciativas Estratégicas"],box:{x:1150,y:660,label:"Aumento Total de Expedition:"}},
+data:[{"n": "HUB", "v": 784657, "c": "#2e66d3", "nc": "#2e66d3", "pos": {"x": 1190, "y": 360, "side": "R"}}, {"n": "Domo cultural", "v": 60200, "c": "#9c8df2", "nc": "#8a6be8", "pos": {"x": 905, "y": 728, "side": "R", "anchor": "start", "lead": 893}}, {"n": "Concesiones", "v": 22566, "c": "#52b6f0", "nc": "#2f9fe0", "pos": {"x": 668, "y": 736, "side": "L", "anchor": "end", "lead": 680}}, {"n": "Socios Corporativos", "v": 47422, "c": "#3d2fd6", "nc": "#3a2bc4", "pos": {"x": 480, "y": 650, "side": "L"}}, {"n": "Concesiones Expedition", "v": 248391, "c": "#4d8df0", "nc": "#2e66d3", "pos": {"x": 440, "y": 450, "side": "L"}}, {"n": "Iniciativas Estratégicas", "v": 323508, "c": "#4b2ccf", "nc": "#3a2bc4", "pos": {"x": 95, "y": 188, "side": "L", "anchor": "start", "lead": 510}, "notes": ["-Incremento de Actividades y Eventos", "  Presenciales Tarde-Noche y Fines de Semana", "-Iniciativas: CPI y Teatro de Decisiones", "-Aumento de Horario de climatización en algunas", "  zonas como OMICS y Biofabrication"]}]};</script>
+<script>// Pastel 3D para diapositiva 16:9 (1600x900). Se escala completo a la ventana.
+(function(){
+const C=window.CHART, NS="http://www.w3.org/2000/svg", svg=document.getElementById("svg");
+const W=1600,H=900, CX=C.cx||800, CY=C.cy||490, R=C.r||255, POP=22, DEPTH=16;
+const el=(t,a={},p)=>{const e=document.createElementNS(NS,t);for(const k in a)e.setAttribute(k,a[k]);if(p)p.appendChild(e);return e};
+const tx=(p,a,s)=>{const e=el("text",a,p);e.textContent=s;return e};
+const pt=(a,r)=>[CX+r*Math.sin(a),CY-r*Math.cos(a)];
+const fmt=n=>n.toLocaleString("en-US");
+const shade=(h,f)=>{const n=parseInt(h.slice(1),16);const c=[n>>16,(n>>8)&255,n&255].map(v=>Math.round(v*f));return`rgb(${c})`};
+const TOTAL=C.data.reduce((s,d)=>s+d.v,0);
+const pct=v=>(v/TOTAL*100).toFixed(2)+"%";
+const defs=el("defs",{},svg);
+el("filter",{id:"blur",x:"-30%",y:"-30%",width:"160%",height:"160%"},defs).appendChild(el("feGaussianBlur",{stdDeviation:"10"}));
+const fs=el("filter",{id:"soft",x:"-20%",y:"-20%",width:"140%",height:"140%"},defs);
+el("feDropShadow",{dx:"0",dy:"6",stdDeviation:"8","flood-color":"#0f1a3d","flood-opacity":".14"},fs);
+const mk=el("marker",{id:"arrow",viewBox:"0 0 10 10",refX:"9",refY:"5",markerWidth:"9",markerHeight:"9",orient:"auto"},defs);
+el("path",{d:"M0,0 L10,5 L0,10 z",fill:"context-stroke"},mk);
+const hl=el("radialGradient",{id:"gloss",cx:"40%",cy:"30%",r:"75%"},defs);
+el("stop",{offset:"0","stop-color":"#fff","stop-opacity":".28"},hl);el("stop",{offset:"1","stop-color":"#fff","stop-opacity":"0"},hl);
+
+// Fondo y encabezado
+el("rect",{width:W,height:H,fill:"#f4f6fb"},svg);
+if(C.header==="band"){
+  const hg=el("linearGradient",{id:"hd",x1:0,x2:0,y1:0,y2:1},defs);
+  el("stop",{offset:0,"stop-color":"#17337a"},hg);el("stop",{offset:1,"stop-color":"#0b1e4e"},hg);
+  el("rect",{x:10,y:8,width:W-20,height:96,rx:16,fill:"url(#hd)",filter:"url(#soft)"},svg);
+  tx(svg,{x:W/2,y:52,"text-anchor":"middle","font-size":40,"font-weight":800,fill:"#fff"},C.title);
+  tx(svg,{x:W/2,y:88,"text-anchor":"middle","font-size":25,fill:"#dfe6ff"},C.subtitle);
+  el("rect",{x:10,y:118,width:W-20,height:H-128,rx:16,fill:"#fff",stroke:"#3e73d8","stroke-width":2},svg);
+  if(C.section){const g=el("g",{},svg);el("circle",{cx:72,cy:160,r:20,fill:"#1e3fd8"},g);el("circle",{cx:72,cy:160,r:11,fill:"none",stroke:"#fff","stroke-width":4},g);el("circle",{cx:72,cy:160,r:4,fill:"#fff"},g);
+    tx(svg,{x:104,y:170,"font-size":28,"font-weight":800,fill:"#1e2fc0"},C.section);}
+}else{
+  el("rect",{x:10,y:10,width:W-20,height:H-20,rx:18,fill:"#fff",filter:"url(#soft)"},svg);
+  tx(svg,{x:W/2,y:68,"text-anchor":"middle","font-size":44,"font-weight":800,fill:"#0f1a3d","letter-spacing":"-0.5"},C.title);
+  tx(svg,{x:W/2,y:106,"text-anchor":"middle","font-size":24,"font-weight":600,fill:"#9a8be0"},C.subtitle);
+}
+
+// Base del pastel (relieve)
+el("ellipse",{cx:CX+6,cy:CY+26,rx:R+10,ry:R+4,fill:"#1b2650",opacity:.16,filter:"url(#blur)"},svg);
+for(let k=DEPTH;k>0;k-=2) el("circle",{cx:CX,cy:CY+k,r:R,fill:shade("#1b2650",1),opacity:.10},svg);
+el("circle",{cx:CX,cy:CY+DEPTH,r:R,fill:"#1b2650",opacity:.30},svg);
+
+const gSl=el("g",{},svg), gOut=el("g",{"pointer-events":"none",class:"grp"},svg), gLb=el("g",{},svg);
+let a0=0; const items=[];
+C.data.forEach((d,i)=>{
+  const sw=d.v/TOTAL*2*Math.PI,a1=a0+sw,mid=a0+sw/2;
+  const [x0,y0]=pt(a0,R),[x1,y1]=pt(a1,R);
+  const dP=`M${CX},${CY} L${x0},${y0} A${R},${R} 0 ${sw>Math.PI?1:0} 1 ${x1},${y1} Z`;
+  const gr=el("linearGradient",{id:"g"+i,x1:0,y1:0,x2:1,y2:1},defs);
+  el("stop",{offset:0,"stop-color":d.c},gr);el("stop",{offset:1,"stop-color":shade(d.c,.80)},gr);
+  const g=el("g",{class:"slice",tabindex:0},gSl);
+  el("path",{class:"shadow",d:dP,fill:"#000",transform:"translate(10,28)",filter:"url(#blur)"},g);
+  const ext=el("g",{class:"ext"},g);
+  for(let k=DEPTH;k>0;k-=1.5) el("path",{d:dP,fill:shade(d.c,.55),transform:`translate(0,${k})`},ext);
+  el("path",{class:"top",d:dP,fill:`url(#g${i})`},g);
+  el("path",{d:dP,fill:"url(#gloss)","pointer-events":"none"},g);
+  const dx=POP*Math.sin(mid),dy=-POP*Math.cos(mid);
+  items.push({d,i,a0,a1,mid,g,pop:`translate(${dx.toFixed(1)}px,${(dy-6).toFixed(1)}px)`});
+  a0=a1;
+});
+// Contorno de grupo (p.ej. Expedition)
+if(C.group){
+  const gi=items.filter(it=>C.group.names.includes(it.d.n));
+  const s=Math.min(...gi.map(x=>x.a0)),e=Math.max(...gi.map(x=>x.a1));
+  const [x0,y0]=pt(s,R),[x1,y1]=pt(e,R);
+  el("path",{d:`M${CX},${CY} L${x0},${y0} A${R},${R} 0 ${e-s>Math.PI?1:0} 1 ${x1},${y1} Z`,fill:"none",stroke:"#e3141b","stroke-width":6,"stroke-linejoin":"round"},gOut);
+}
+
+// Etiquetas
+const LH={name:30,note:24,val:28};
+const inline=C.inline;
+items.forEach(it=>{
+  const d=it.d; it.side=d.pos?d.pos.side:((C.forceRight||[]).includes(d.n)||Math.sin(it.mid)>=0?"R":"L");
+  it.h=LH.name*(d.nameLines||[d.n]).length+(d.notes||[]).length*LH.note+(inline?1:2)*LH.val;
+  it.y=CY-(R+70)*Math.cos(it.mid)-it.h/2;
+});
+const TOP=C.labelTop||140, BOT=C.labelBottom||830, GAP0=C.gap||10;
+for(const s of["L","R"]){
+  const arr=items.filter(it=>it.side===s&&!it.d.pos).sort((a,b)=>a.y-b.y); if(!arr.length)continue;
+  const sumH=arr.reduce((t,x)=>t+x.h,0), GAP=Math.min(GAP0,arr.length>1?(BOT-TOP-sumH)/(arr.length-1):GAP0);
+  for(let k=0;k<arr.length;k++) arr[k].y=Math.max(arr[k].y,k?arr[k-1].y+arr[k-1].h+GAP:TOP);
+  const last=arr[arr.length-1]; if(last.y+last.h>BOT){last.y=BOT-last.h;
+    for(let k=arr.length-2;k>=0;k--) arr[k].y=Math.min(arr[k].y,arr[k+1].y-arr[k].h-GAP);}
+  if(arr[0].y<TOP){arr[0].y=TOP;for(let k=1;k<arr.length;k++) arr[k].y=Math.max(arr[k].y,arr[k-1].y+arr[k-1].h+GAP);}
+}
+items.forEach(it=>{
+  const d=it.d,right=it.side==="R";
+  let lx=right?CX+R+(C.labelDx||120):CX-R-(C.labelDx||120);
+  if(d.pos){lx=d.pos.x;it.y=d.pos.y;}
+  const anc=d.pos&&d.pos.anchor?d.pos.anchor:(right?"start":"end"), g=el("g",{class:"lbl"},gLb);
+  const box=el("rect",{class:"box",rx:12,fill:"#fff",stroke:d.c,"stroke-width":2.5,filter:"url(#soft)"},g);
+  const nameY=it.y+24;
+  const [sx,sy]=pt(it.mid,R-12),[ex,ey]=pt(it.mid,R+POP+26);
+  const endX=d.pos&&d.pos.lead?d.pos.lead:lx+(anc==="start"?-12:12);
+  let dd=`M${sx},${sy} L${ex},${ey} L${endX},${nameY-9}`;
+  const fr=(C.forceRight||[]).indexOf(d.n);
+  if(fr>=0&&Math.sin(it.mid)<0){const [fx,fy]=pt(it.mid,R+22+((C.forceRight.length-1-fr)*16));dd=`M${sx},${sy} L${fx},${fy} H${CX+R+30} L${endX},${nameY-9}`;}
+  const lead=el("path",{class:"lead",d:dd,stroke:"#222","stroke-linejoin":"round"},g);
+  el("circle",{class:"dot",cx:sx,cy:sy,r:4.5,fill:"#fff",stroke:d.c,"stroke-width":2},g);
+  const t=el("text",{x:lx,y:nameY,"text-anchor":anc},g);
+  (d.nameLines||[d.n]).forEach((ln,k)=>{const s=el("tspan",{x:lx,dy:k?LH.name:0,class:"name",fill:d.nc||C.nameColor(it.i)},t);s.textContent=ln});
+  (d.notes||[]).forEach((ln,k)=>{const s=el("tspan",{x:lx,dy:k?LH.note-2:LH.note+4,class:"note",fill:"#3355d8"},t);s.textContent=ln});
+  const pc=C.pctColor||C.nameColor(it.i);
+  if(inline){const a=el("tspan",{x:lx,dy:LH.val,class:"val",fill:"#222"},t);a.textContent=fmt(d.v)+" kWh  ";
+    const b=el("tspan",{class:"pct",fill:pc},t);b.textContent=pct(d.v);}
+  else (C.order||["pct","val"]).forEach((kind,k)=>{const s=el("tspan",{x:lx,dy:LH.val+(k?0:4),class:kind,fill:kind==="pct"?pc:"#222"},t);s.textContent=kind==="pct"?pct(d.v):fmt(d.v)+" kWh"});
+  it.lbl=g;it.box=box;it.lead=lead;it.text=t;
+});
+requestAnimationFrame(()=>items.forEach(it=>{const b=it.text.getBBox();
+  [["x",b.x-14],["y",b.y-8],["width",b.width+28],["height",b.height+16]].forEach(([k,v])=>it.box.setAttribute(k,v))}));
+
+// Extras: total y caja
+if(C.totalText){const g=el("g",{},svg);
+  if(C.totalStyle==="pill"){el("rect",{x:W/2-250,y:H-92,width:500,height:66,rx:18,fill:"#eef6ff",stroke:"#5aa9ef","stroke-width":2.5},g);
+    const t=el("text",{x:W/2,y:H-47,"text-anchor":"middle","font-size":38,"font-weight":800,fill:"#0f1a3d"},g);
+    t.appendChild(document.createTextNode("Total: "));const b=el("tspan",{fill:"#1565d8"},t);b.textContent=fmt(TOTAL)+" kWh";}
+  else tx(g,{x:W/2,y:H-30,"text-anchor":"middle","font-size":38,"font-weight":800,fill:"#e3141b"},C.totalText.replace("{T}",fmt(TOTAL)));}
+if(C.group&&C.group.box){const gv=items.filter(it=>C.group.names.includes(it.d.n)).reduce((s,x)=>s+x.d.v,0);
+  const b=C.group.box,g=el("g",{},svg);
+  el("rect",{x:b.x,y:b.y,width:420,height:168,rx:14,fill:"#fff",stroke:"#222","stroke-width":2,filter:"url(#soft)"},g);
+  tx(g,{x:b.x+210,y:b.y+44,"text-anchor":"middle","font-size":28,fill:"#222"},b.label);
+  tx(g,{x:b.x+210,y:b.y+95,"text-anchor":"middle","font-size":40,"font-weight":700,fill:"#e3141b"},pct(gv));
+  tx(g,{x:b.x+210,y:b.y+145,"text-anchor":"middle","font-size":40,"font-weight":700,fill:"#222"},fmt(gv)+" kWh");}
+
+// Interacción
+let active=null;
+function set(it){
+  if(active===it)return;
+  if(active){active.g.classList.remove("on");active.g.style.transform="";active.lbl.classList.remove("on");active.lead.removeAttribute("marker-end");active.lead.setAttribute("stroke","#222")}
+  active=it; svg.classList.toggle("has-on",!!it);
+  if(it){gSl.appendChild(it.g);gLb.appendChild(it.lbl);it.g.classList.add("on");it.lbl.classList.add("on");
+    it.lead.setAttribute("stroke",it.d.c);it.lead.setAttribute("marker-end","url(#arrow)");
+    requestAnimationFrame(()=>it.g.style.transform=it.pop);}
+}
+items.forEach(it=>{
+  it.g.addEventListener("mouseenter",()=>set(it));it.g.addEventListener("focus",()=>set(it));
+  it.g.addEventListener("click",e=>{e.stopPropagation();set(active===it?null:it)});
+  it.lbl.addEventListener("mouseenter",()=>set(it));it.lbl.addEventListener("click",e=>{e.stopPropagation();set(active===it?null:it)});
+});
+gSl.addEventListener("mouseleave",e=>{if(!gLb.contains(e.relatedTarget))set(null)});
+gLb.addEventListener("mouseleave",e=>{if(!gSl.contains(e.relatedTarget))set(null)});
+document.addEventListener("click",()=>set(null));
+
+// Animación de entrada: se repite cada vez que el visor muestra la diapositiva
+function intro(){
+  svg.classList.remove("intro"); void svg.getBoundingClientRect(); svg.classList.add("intro");
+  items.forEach((it,k)=>{it.g.style.animationDelay=(k*0.06)+"s";it.lbl.style.animationDelay=(0.5+k*0.05)+"s"});
+}
+window.addEventListener("message",e=>{if(e.data==="play")intro()});
+if(!window.frameElement) intro();
+})();
+</script>
+</body></html>

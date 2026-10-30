@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Semana 43 – Reunión de Indicadores</title>
+<style>
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:#0d1426;overflow:hidden;font-family:"Segoe UI",system-ui,sans-serif}
+#stage{position:absolute;inset:0 0 44px 0;display:flex;align-items:center;justify-content:center}
+.slide{position:absolute;aspect-ratio:16/9;width:min(100vw,calc((100vh - 44px)*16/9));background:#fff;box-shadow:0 10px 40px rgba(0,0,0,.45);
+  opacity:0;pointer-events:none;transition:opacity .35s}
+.slide.on{opacity:1;pointer-events:auto}
+.slide img,.slide iframe{display:block;width:100%;height:100%;border:0;object-fit:contain}
+.badge{position:absolute;top:10px;right:12px;background:#1565d8;color:#fff;font-size:12px;padding:3px 9px;border-radius:20px;opacity:.85;pointer-events:none}
+#bar{position:absolute;left:0;right:0;bottom:0;height:44px;display:flex;align-items:center;justify-content:center;gap:10px;color:#cfd8f0;font-size:14px}
+#bar button{background:#1b2650;color:#fff;border:1px solid #2f3d70;border-radius:8px;height:30px;min-width:38px;padding:0 10px;cursor:pointer;font-size:15px}
+#bar button:hover{background:#26346b}
+#prog{position:absolute;left:0;bottom:0;height:3px;background:#1565d8;transition:width .3s}
+body.fs #bar{opacity:0;transition:opacity .3s}body.fs #bar:hover{opacity:1}
+body.fs #stage{inset:0}
+body.fs .slide{width:min(100vw,calc(100vh*16/9))}
+</style></head><body>
+<div id="stage"></div>
+<div id="bar"><button id="prev" title="Anterior (←)">‹</button><span id="num"></span><button id="next" title="Siguiente (→)">›</button>
+<button id="full" title="Pantalla completa (F)">⛶ Pantalla completa</button></div>
+<div id="prog"></div>
+<script>
+const S=[{"img": "img/s01.jpg", "live": null}, {"img": "img/s02.jpg", "live": null}, {"img": "img/s03.jpg", "live": null}, {"img": "img/s04.jpg", "live": null}, {"img": "img/s05.jpg", "live": null}, {"img": "img/s06.jpg", "live": null}, {"img": "img/s07.jpg", "live": null}, {"img": "img/s08.jpg", "live": null}, {"img": "img/s09.jpg", "live": null}, {"img": "img/s10.jpg", "live": null}, {"img": "img/s11.jpg", "live": null}, {"img": "img/s12.jpg", "live": null}, {"img": "img/s13.jpg", "live": null}, {"img": "img/s14.jpg", "live": null}, {"img": "img/s15.jpg", "live": null}, {"img": "img/s16.jpg", "live": null}, {"img": "img/s17.jpg", "live": null}, {"img": "img/s18.jpg", "live": "../cargas-identificadas-s43.html"}, {"img": "img/s19.jpg", "live": null}, {"img": "img/s20.jpg", "live": null}, {"img": "img/s21.jpg", "live": null}, {"img": "img/s22.jpg", "live": "../aumento-ene-sep.html"}, {"img": "img/s23.jpg", "live": "../ahorro-ene-sep.html"}, {"img": "img/s24.jpg", "live": null}, {"img": "img/s25.jpg", "live": null}];
+const stage=document.getElementById("stage"),els=[];
+S.forEach((s,i)=>{const d=document.createElement("div");d.className="slide";
+  if(s.live){d.dataset.live=s.live;d.innerHTML='<img src="'+s.img+'" alt="Diapositiva '+(i+1)+'"><span class="badge">Interactiva</span>'}
+  else d.innerHTML='<img loading="'+(i<2?"eager":"lazy")+'" src="'+s.img+'" alt="Diapositiva '+(i+1)+'">';
+  stage.appendChild(d);els.push(d)});
+let cur=0;
+function hook(fr){try{fr.contentWindow.document.addEventListener("keydown",key)}catch(e){}}
+function go(n){
+  n=Math.max(0,Math.min(S.length-1,n));els[cur].classList.remove("on");cur=n;const d=els[cur];
+  if(d.dataset.live&&!d.querySelector("iframe")){const f=document.createElement("iframe");f.src=d.dataset.live;f.onload=()=>{hook(f);const im=d.querySelector("img");if(im)im.remove()};
+    f.style.position="absolute";f.style.inset="0";d.appendChild(f)}
+  d.classList.add("on");
+  [cur+1,cur+2].forEach(k=>{if(els[k]){const im=els[k].querySelector("img");if(im)im.loading="eager"}});
+  document.getElementById("num").textContent=(cur+1)+" / "+S.length;
+  document.getElementById("prog").style.width=((cur+1)/S.length*100)+"%";
+  history.replaceState(null,"","#"+(cur+1));
+}
+function key(e){
+  if(["ArrowRight","PageDown"," ","Enter"].includes(e.key)){e.preventDefault();go(cur+1)}
+  else if(["ArrowLeft","PageUp","Backspace"].includes(e.key)){e.preventDefault();go(cur-1)}
+  else if(e.key==="Home")go(0);else if(e.key==="End")go(S.length-1);
+  else if(e.key==="f"||e.key==="F")full();
+}
+function full(){if(!document.fullscreenElement)document.documentElement.requestFullscreen().catch(()=>{});else document.exitFullscreen()}
+document.addEventListener("fullscreenchange",()=>document.body.classList.toggle("fs",!!document.fullscreenElement));
+document.addEventListener("keydown",key);
+document.getElementById("prev").onclick=()=>go(cur-1);
+document.getElementById("next").onclick=()=>go(cur+1);
+document.getElementById("full").onclick=full;
+let tx=null;stage.addEventListener("touchstart",e=>tx=e.touches[0].clientX,{passive:true});
+stage.addEventListener("touchend",e=>{if(tx===null)return;const dx=e.changedTouches[0].clientX-tx;if(Math.abs(dx)>50)go(cur+(dx<0?1:-1));tx=null});
+go((parseInt(location.hash.slice(1))||1)-1);
+</script></body></html>
