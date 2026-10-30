@@ -1,200 +1,60 @@
 <!doctype html>
-<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Aumento kWh Enero–Septiembre</title>
-<meta name="claude:viewport-fit-sides" content="cover">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;600;700;800&display=swap">
+<html lang="es"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Semana 43 – Reunión de Indicadores</title>
 <style>
-/* Layout: título arriba, pastel con etiquetas a ambos lados, franja de detalle abajo */
-:root{
-  --bg:#f5f7fc; --card:#ffffff; --fg:#0f1a3d; --muted:#5d6a8f; --line:#c9d2ea;
-  --accent:#1565d8; --violet:#7b4fe0; --depth:#1b2650;
-  --font:"Lexend",system-ui,-apple-system,"Segoe UI",sans-serif;
-}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
-  --bg:#0b1024; --card:#131a36; --fg:#eef2ff; --muted:#9aa6cc; --line:#2c3762;
-  --accent:#5aa2ff; --violet:#b293ff; --depth:#02040c; color-scheme:dark}}
-:root[data-theme="dark"]{
-  --bg:#0b1024; --card:#131a36; --fg:#eef2ff; --muted:#9aa6cc; --line:#2c3762;
-  --accent:#5aa2ff; --violet:#b293ff; --depth:#02040c; color-scheme:dark}
-html,body{background:var(--bg);color:var(--fg);font-family:var(--font)}
-.wrap{max-width:1180px;margin:0 auto;padding-block:24px 32px;
-  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
-.card{background:var(--card);border-radius:18px;padding:22px clamp(8px,2vw,28px);box-shadow:0 10px 40px rgba(15,26,61,.08)}
-h1{margin:0;text-align:center;font-weight:800;font-size:clamp(20px,3.4vw,38px);text-wrap:balance;letter-spacing:-.01em}
-.sub{text-align:center;color:var(--violet);font-weight:600;margin:4px 0 0;font-size:clamp(13px,1.6vw,19px)}
-.chart{overflow-x:auto}
-svg{display:block;width:100%;height:auto;min-width:640px;max-width:1100px;margin:0 auto}
-.slice{cursor:pointer;transition:transform .45s cubic-bezier(.2,.9,.25,1.2);outline:none}
-.slice .top{stroke:var(--card);stroke-width:2;transition:filter .3s}
-.slice .ext,.slice .shadow{opacity:0;transition:opacity .3s}
-.slice.on .ext{opacity:1}.slice.on .shadow{opacity:.45}
-.slice.on .top{filter:brightness(1.08) saturate(1.1)}
-.chart.has-on .slice:not(.on) .top{filter:saturate(.7) opacity(.7)}
-.lbl{transition:opacity .3s}
-.chart.has-on .lbl:not(.on){opacity:.28}
-.lbl .name{font-weight:700;font-size:15px}
-.lbl .val{font-size:13px;fill:var(--muted)}
-.lbl .pct{font-weight:700;font-size:15px}
-.lbl .lead{fill:none;stroke-width:1.4;transition:stroke-width .3s}
-.lbl.on .lead{stroke-width:3}
-.lbl .box{opacity:0;transition:opacity .3s}
-.lbl.on .box{opacity:1}
-.lbl .arrow{opacity:0;transition:opacity .3s}.lbl.on .arrow{opacity:1}
-.lbl .dot{transition:opacity .3s}.lbl.on .dot{opacity:0}
-.total{display:flex;justify-content:center;margin-top:4px}
-.total span{border:2px solid var(--accent);border-radius:14px;padding:8px 22px;font-weight:700;font-size:clamp(18px,2.4vw,28px);font-variant-numeric:tabular-nums}
-.total b{color:var(--accent)}
-.detail{margin-top:18px;display:flex;flex-wrap:wrap;gap:10px 28px;justify-content:center;align-items:baseline;min-height:56px;font-variant-numeric:tabular-nums}
-.detail .k{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
-.detail .v{font-size:20px;font-weight:700}
-.detail .item{display:flex;flex-direction:column;gap:2px;min-width:0}
-.hint{color:var(--muted);text-align:center;font-size:13px;margin-top:10px}
-@media (prefers-reduced-motion:reduce){.slice,.slice *,.lbl,.lbl *{transition:none!important}}
-</style>
-
-<div class="wrap">
-  <div class="card">
-    <h1>15 espacios con más aumento en kWh Acumulado Enero – Septiembre</h1>
-    <p class="sub">Excluyendo Espacios Nuevos</p>
-    <div class="chart" id="chart">
-      <svg id="svg" viewBox="0 0 1120 760" role="img" aria-label="Gráfica de pastel de aumento en kWh por espacio"></svg>
-    </div>
-    <div class="total"><span>Total: <b>1,013,616 kWh</b></span></div>
-    <div class="detail" id="detail" aria-live="polite"></div>
-    <p class="hint">Pasa el cursor (o toca) una rebanada para destacarla.</p>
-  </div>
-</div>
-
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:#0d1426;overflow:hidden;font-family:"Segoe UI",system-ui,sans-serif}
+#stage{position:absolute;inset:0 0 44px 0;display:flex;align-items:center;justify-content:center}
+.slide{position:absolute;aspect-ratio:16/9;width:min(100vw,calc((100vh - 44px)*16/9));background:#fff;box-shadow:0 10px 40px rgba(0,0,0,.45);
+  opacity:0;pointer-events:none;transition:opacity .35s}
+.slide.on{opacity:1;pointer-events:auto}
+.slide img,.slide iframe{display:block;width:100%;height:100%;border:0;object-fit:contain}
+.badge{position:absolute;top:10px;right:12px;background:#1565d8;color:#fff;font-size:12px;padding:3px 9px;border-radius:20px;opacity:.85;pointer-events:none}
+#bar{position:absolute;left:0;right:0;bottom:0;height:44px;display:flex;align-items:center;justify-content:center;gap:10px;color:#cfd8f0;font-size:14px}
+#bar button{background:#1b2650;color:#fff;border:1px solid #2f3d70;border-radius:8px;height:30px;min-width:38px;padding:0 10px;cursor:pointer;font-size:15px}
+#bar button:hover{background:#26346b}
+#prog{position:absolute;left:0;bottom:0;height:3px;background:#1565d8;transition:width .3s}
+body.fs #bar{opacity:0;transition:opacity .3s}body.fs #bar:hover{opacity:1}
+body.fs #stage{inset:0}
+body.fs .slide{width:min(100vw,calc(100vh*16/9))}
+</style></head><body>
+<div id="stage"></div>
+<div id="bar"><button id="prev" title="Anterior (←)">‹</button><span id="num"></span><button id="next" title="Siguiente (→)">›</button>
+<button id="full" title="Pantalla completa (F)">⛶ Pantalla completa</button></div>
+<div id="prog"></div>
 <script>
-const DATA=[
- ["Megacentral",294937,"29.10%","#1565d8"],
- ["CAH3",135707,"13.39%","#2ec4f0"],
- ["Aulas 4",91483,"9.03%","#47b2f3"],
- ["Residencias 1",87599,"8.64%","#3d97f0"],
- ["CEDES",86122,"8.50%","#3b80ef"],
- ["CETEC",55319,"5.46%","#3a69ea"],
- ["Laboratorios DÍA",42236,"4.17%","#4a55e0"],
- ["Estacionamiento 3",40086,"3.95%","#6347e6"],
- ["CETEC - Laboratorios de Manufactura",37352,"3.69%","#8a5cf0"],
- ["Wellness",33324,"3.29%","#a37af2"],
- ["Estacionamiento 1",27858,"2.75%","#b28ef4"],
- ["Residencias 10 y 15",24850,"2.45%","#c2a5f6"],
- ["Estacionamiento 2",22682,"2.24%","#d0bcf8"],
- ["Aulas 7",18978,"1.87%","#dccffa"],
- ["Rectoría",15083,"1.49%","#e6ddfc"]
-];
-const TOTAL=DATA.reduce((s,d)=>s+d[1],0), AVG=TOTAL/DATA.length;
-const NS="http://www.w3.org/2000/svg", svg=document.getElementById("svg"), chart=document.getElementById("chart");
-const CX=560, CY=390, R=225, POP=24, DEPTH=14;
-const el=(t,a={},p)=>{const e=document.createElementNS(NS,t);for(const k in a)e.setAttribute(k,a[k]);if(p)p.appendChild(e);return e};
-const pt=(a,r)=>[CX+r*Math.sin(a),CY-r*Math.cos(a)];
-const fmt=n=>n.toLocaleString("en-US");
-// darken hex
-const shade=(h,f)=>{const n=parseInt(h.slice(1),16);const c=[n>>16,(n>>8)&255,n&255].map(v=>Math.round(v*f));return`rgb(${c})`};
-
-const defs=el("defs",{},svg);
-el("filter",{id:"blur",x:"-30%",y:"-30%",width:"160%",height:"160%"},defs).appendChild(el("feGaussianBlur",{stdDeviation:"9"}));
-const mk=el("marker",{id:"arrow",viewBox:"0 0 10 10",refX:"8",refY:"5",markerWidth:"7",markerHeight:"7",orient:"auto-start-reverse"},defs);
-el("path",{d:"M0,0 L10,5 L0,10 z",fill:"context-stroke"},mk);
-
-// base 3D puck under the pie
-el("ellipse",{cx:CX+4,cy:CY+18,rx:R+6,ry:R,fill:"var(--depth)",opacity:.18,filter:"url(#blur)"},svg);
-el("circle",{cx:CX,cy:CY+8,r:R,fill:"var(--depth)",opacity:.35},svg);
-
-const gSlices=el("g",{},svg), gLabels=el("g",{},svg);
-let a0=0; const items=[];
-DATA.forEach((d,i)=>{
-  const sweep=d[1]/TOTAL*2*Math.PI, a1=a0+sweep, mid=a0+sweep/2;
-  const [x0,y0]=pt(a0,R),[x1,y1]=pt(a1,R), large=sweep>Math.PI?1:0;
-  const dPath=`M${CX},${CY} L${x0},${y0} A${R},${R} 0 ${large} 1 ${x1},${y1} Z`;
-  const grad=el("linearGradient",{id:"g"+i,x1:"0",y1:"0",x2:"1",y2:"1"},defs);
-  el("stop",{offset:"0","stop-color":d[3]},grad);
-  el("stop",{offset:"1","stop-color":shade(d[3],.82)},grad);
-
-  const g=el("g",{class:"slice",tabindex:"0",role:"button","aria-label":`${d[0]}: ${fmt(d[1])} kWh, ${d[2]}`},gSlices);
-  el("path",{class:"shadow",d:dPath,fill:"#000",transform:"translate(10,26)",filter:"url(#blur)"},g);
-  const ext=el("g",{class:"ext"},g);
-  for(let k=DEPTH;k>0;k-=1.5) el("path",{d:dPath,fill:shade(d[3],.55),transform:`translate(0,${k})`},ext);
-  el("path",{class:"top",d:dPath,fill:`url(#g${i})`},g);
-  const dx=POP*Math.sin(mid), dy=-POP*Math.cos(mid);
-  items.push({d,i,mid,g,pop:`translate(${dx.toFixed(1)}px,${(dy-6).toFixed(1)}px)`,rank:i+1});
-  a0=a1;
-});
-
-// label layout: split by side, spread vertically
-const GAP=44, sides={L:[],R:[]};
-items.forEach(it=>{it.side=Math.sin(it.mid)>=0?"R":"L";it.y=CY-(R+60)*Math.cos(it.mid);sides[it.side].push(it)});
-for(const s of["L","R"]){
-  const arr=sides[s].sort((a,b)=>a.y-b.y);
-  const ex=it=>it.d[0].length>20?17:0;
-  for(let k=1;k<arr.length;k++) arr[k].y=Math.max(arr[k].y,arr[k-1].y+GAP+ex(arr[k]));
-  const maxY=740; const over=arr.length?arr[arr.length-1].y-maxY:0;
-  if(over>0) arr.forEach(it=>it.y-=over);
-  for(let k=arr.length-2;k>=0;k--) arr[k].y=Math.min(arr[k].y,arr[k+1].y-GAP-ex(arr[k+1]));
+const S=[{"img": "img/s01.jpg", "live": null}, {"img": "img/s02.jpg", "live": null}, {"img": "img/s03.jpg", "live": null}, {"img": "img/s04.jpg", "live": null}, {"img": "img/s05.jpg", "live": null}, {"img": "img/s06.jpg", "live": null}, {"img": "img/s07.jpg", "live": null}, {"img": "img/s08.jpg", "live": null}, {"img": "img/s09.jpg", "live": null}, {"img": "img/s10.jpg", "live": null}, {"img": "img/s11.jpg", "live": null}, {"img": "img/s12.jpg", "live": null}, {"img": "img/s13.jpg", "live": null}, {"img": "img/s14.jpg", "live": null}, {"img": "img/s15.jpg", "live": null}, {"img": "img/s16.jpg", "live": null}, {"img": "img/s17.jpg", "live": null}, {"img": "img/s18.jpg", "live": "../cargas-identificadas-s43.html"}, {"img": "img/s19.jpg", "live": null}, {"img": "img/s20.jpg", "live": null}, {"img": "img/s21.jpg", "live": null}, {"img": "img/s22.jpg", "live": "../aumento-ene-sep.html"}, {"img": "img/s23.jpg", "live": "../ahorro-ene-sep.html"}, {"img": "img/s24.jpg", "live": null}, {"img": "img/s25.jpg", "live": null}];
+const stage=document.getElementById("stage"),els=[];
+S.forEach((s,i)=>{const d=document.createElement("div");d.className="slide";
+  if(s.live){d.dataset.live=s.live;d.innerHTML='<img src="'+s.img+'" alt="Diapositiva '+(i+1)+'"><span class="badge">Interactiva</span>'}
+  else d.innerHTML='<img loading="'+(i<2?"eager":"lazy")+'" src="'+s.img+'" alt="Diapositiva '+(i+1)+'">';
+  stage.appendChild(d);els.push(d)});
+let cur=0;
+function hook(fr){try{fr.contentWindow.document.addEventListener("keydown",key)}catch(e){}}
+function go(n){
+  n=Math.max(0,Math.min(S.length-1,n));els[cur].classList.remove("on");cur=n;const d=els[cur];
+  if(d.dataset.live&&!d.querySelector("iframe")){const f=document.createElement("iframe");f.src=d.dataset.live;f.onload=()=>{hook(f);const im=d.querySelector("img");if(im)im.remove()};
+    f.style.position="absolute";f.style.inset="0";d.appendChild(f)}
+  d.classList.add("on");
+  [cur+1,cur+2].forEach(k=>{if(els[k]){const im=els[k].querySelector("img");if(im)im.loading="eager"}});
+  document.getElementById("num").textContent=(cur+1)+" / "+S.length;
+  document.getElementById("prog").style.width=((cur+1)/S.length*100)+"%";
+  history.replaceState(null,"","#"+(cur+1));
 }
-items.forEach(it=>{
-  const {d,side,y,mid}=it, right=side==="R";
-  const lx=right?CX+R+85:CX-R-85, anchor=right?"start":"end";
-  const [sx,sy]=pt(mid,R+POP+4), [ex,ey]=pt(mid,R+POP+22);
-  const g=el("g",{class:"lbl"},gLabels);
-  const color=d[3];
-  const box=el("rect",{class:"box",rx:10,fill:"var(--card)",stroke:color,"stroke-width":2},g);
-  el("path",{class:"lead",d:`M${sx},${sy} L${ex},${ey} L${lx+(right?-8:8)},${y-6}`,stroke:color},g);
-  el("circle",{class:"dot",cx:sx,cy:sy,r:3.5,fill:color},g);
-  // nombres largos en dos líneas
-  let lines=[d[0]];
-  if(d[0].length>20){const cut=d[0].lastIndexOf(" ",Math.ceil(d[0].length/2)+2);lines=[d[0].slice(0,cut),d[0].slice(cut+1)]}
-  const off=(lines.length-1)*17;
-  const t=el("text",{x:lx,y:y-10-off,"text-anchor":anchor},g);
-  lines.forEach((ln,k)=>{const n=el("tspan",{class:"name",fill:"var(--fg)",x:lx,dy:k?17:0},t);n.textContent=ln});
-  const t2=el("text",{x:lx,y:y+9,"text-anchor":anchor},g);
-  const v=el("tspan",{class:"val"},t2);v.textContent=fmt(d[1])+" kWh  ";
-  const p=el("tspan",{class:"pct",fill:color},t2);p.textContent=d[2];
-  it.lbl=g;it.box=box;it.lead=g.querySelector(".lead");it.texts=[t,t2];
-});
-// size boxes after render
-requestAnimationFrame(()=>items.forEach(it=>{
-  const b1=it.texts[0].getBBox(),b2=it.texts[1].getBBox();
-  const x=Math.min(b1.x,b2.x)-12,y=b1.y-8,w=Math.max(b1.x+b1.width,b2.x+b2.width)-x+12,h=b2.y+b2.height-y+8;
-  Object.entries({x,y,width:w,height:h}).forEach(([k,v])=>it.box.setAttribute(k,v));
-}));
-
-const detail=document.getElementById("detail");
-function showDetail(it){
-  const cells=it?[
-    ["Espacio",it.d[0]],["Posición",`#${it.rank} de 15`],["Aumento",fmt(it.d[1])+" kWh"],
-    ["Del total",it.d[2]],["Vs. promedio",(it.d[1]/AVG).toFixed(2)+"×"]
-  ]:[
-    ["Espacios","15"],["Top 3",((DATA[0][1]+DATA[1][1]+DATA[2][1])/TOTAL*100).toFixed(2)+"% del total"],
-    ["Promedio por espacio",fmt(Math.round(AVG))+" kWh"]
-  ];
-  detail.innerHTML=cells.map(([k,v])=>`<div class="item"><span class="k">${k}</span><span class="v">${v}</span></div>`).join("");
+function key(e){
+  if(["ArrowRight","PageDown"," ","Enter"].includes(e.key)){e.preventDefault();go(cur+1)}
+  else if(["ArrowLeft","PageUp","Backspace"].includes(e.key)){e.preventDefault();go(cur-1)}
+  else if(e.key==="Home")go(0);else if(e.key==="End")go(S.length-1);
+  else if(e.key==="f"||e.key==="F")full();
 }
-let active=null;
-function set(it){
-  if(active===it) return;
-  if(active){active.g.classList.remove("on");active.g.style.transform="";active.lbl.classList.remove("on");active.lead.removeAttribute("marker-start")}
-  active=it;
-  chart.classList.toggle("has-on",!!it);
-  if(it){
-    gSlices.appendChild(it.g); gLabels.appendChild(it.lbl);
-    it.g.classList.add("on"); it.lbl.classList.add("on"); it.lead.setAttribute("marker-start","url(#arrow)");
-    requestAnimationFrame(()=>it.g.style.transform=it.pop);
-  }
-  showDetail(it);
-}
-items.forEach(it=>{
-  it.g.addEventListener("mouseenter",()=>set(it));
-  it.g.addEventListener("focus",()=>set(it));
-  it.g.addEventListener("click",e=>{e.stopPropagation();set(active===it&&e.pointerType!=="mouse"?null:it)});
-  it.lbl.style.cursor="pointer";
-  it.lbl.addEventListener("mouseenter",()=>set(it));
-});
-gSlices.addEventListener("mouseleave",e=>{if(!gLabels.contains(e.relatedTarget))set(null)});
-gLabels.addEventListener("mouseleave",e=>{if(!gSlices.contains(e.relatedTarget))set(null)});
-document.addEventListener("click",()=>set(null));
-showDetail(null);
-</script>
-
-</html>
+function full(){if(!document.fullscreenElement)document.documentElement.requestFullscreen().catch(()=>{});else document.exitFullscreen()}
+document.addEventListener("fullscreenchange",()=>document.body.classList.toggle("fs",!!document.fullscreenElement));
+document.addEventListener("keydown",key);
+document.getElementById("prev").onclick=()=>go(cur-1);
+document.getElementById("next").onclick=()=>go(cur+1);
+document.getElementById("full").onclick=full;
+let tx=null;stage.addEventListener("touchstart",e=>tx=e.touches[0].clientX,{passive:true});
+stage.addEventListener("touchend",e=>{if(tx===null)return;const dx=e.changedTouches[0].clientX-tx;if(Math.abs(dx)>50)go(cur+(dx<0?1:-1));tx=null});
+go((parseInt(location.hash.slice(1))||1)-1);
+</script></body></html>
